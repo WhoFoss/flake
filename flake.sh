@@ -360,9 +360,15 @@ trocar_ip() {
     [ "$ok" -ge 2 ] || return 1
 
     sleep 1
-    local ip
-    ip=$(curl -s --socks5-hostname "${socks_host}:${socks_porta}" \
-         https://check.torproject.org/api/ip | grep -oE '"IP":"[^"]+"' | cut -d'"' -f4)
+
+    local ip tentativa=0
+    while [ "$tentativa" -lt 2 ]; do
+        ip=$(curl -s --max-time 10 --socks5-hostname "${socks_host}:${socks_porta}" \
+             https://check.torproject.org/api/ip | grep -oE '"IP":"[^"]+"' | cut -d'"' -f4)
+        [ -n "$ip" ] && break
+        tentativa=$((tentativa + 1))
+        sleep 1
+    done
     printf 'Novo IP Tor: %s\n' "${ip:-indisponível}"
 }
 
