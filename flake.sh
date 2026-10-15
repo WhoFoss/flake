@@ -346,7 +346,7 @@ limpar() {
 trocar_ip() {
     [ -n "$tor_cookie" ] || return 1
 
-    exec 3<>"/dev/tcp/127.0.0.1/${porta_ctrl}" 2>/dev/null || return 1
+    { exec 3<>"/dev/tcp/127.0.0.1/${porta_ctrl}"; } 2>/dev/null || return 1
     printf 'AUTHENTICATE %s\r\nSIGNAL NEWNYM\r\nQUIT\r\n' "$tor_cookie" >&3
 
     local ok=0 linha
